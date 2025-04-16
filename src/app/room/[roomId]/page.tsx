@@ -11,7 +11,8 @@ export default function RoomPage() {
   const params = useParams();
   const roomId = params.roomId as string;
   const [copied, setCopied] = useState(false);
-  const [userCount, setUserCount] = useState(1);
+  const [userCount, setUserCount] = useState(0);
+
 
   useEffect(() => {
     if (socket) {
@@ -19,7 +20,8 @@ export default function RoomPage() {
         setUserCount(info.users.length);
       });
 
-      socket.on("user-connected", () => {
+      socket.on("user-connected", (roomId, userId) => {
+        console.log(userId, roomId)
         setUserCount((prevCount) => prevCount + 1);
       });
 
@@ -37,7 +39,6 @@ export default function RoomPage() {
     }
   }, []);
 
-  console.log(process.env.NEXT_PUBLIC_SERVER_URL)
   const copyRoomLink = () => {
     const url = window.location.href;
 

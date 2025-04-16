@@ -8,6 +8,19 @@ export const createPeer = (
   initiator: boolean = false
 ): Peer.Instance => {
   return new Peer({
+    config: {
+      iceServers: [
+        {
+          urls: "stun:stun.1.google.com:19302",
+        },
+        {
+          urls: "stun1:stun.1.google.com:19302",
+        },
+        {
+          urls: "stun:stun2.1.google.com:19302",
+        },
+      ],
+    },
     initiator,
     trickle: false,
     stream,
@@ -20,18 +33,14 @@ export const addPeerListeners = (
   onStream: (stream: MediaStream) => void
 ) => {
   peer.on("signal", (signal) => {
-    if (socket) {
-      socket.emit("send-signal", { roomId, signal });
-    } else {
-      console.error("Socket is null. Unable to send signal.");
-    }
+    socket?.emit("send-signal", roomId, signal);
   });
 
   peer.on("stream", (signal) => {
     onStream(signal);
   });
 
-  socket?.on("receive-signal", ({ signal, senderId }) => {
+  socket?.on("receive-signal", (signal, senderId) => {
     peer.signal(signal);
   });
 
@@ -40,13 +49,17 @@ export const addPeerListeners = (
   });
 };
 
+const isBrowser =
+  typeof window !== "undefined" &&
+  typeof navigator !== "undefined" &&
+  navigator.mediaDevices;
 export const startScreenShare = async (): Promise<MediaStream | null> => {
   try {
+    if (!isBrowser) return null;
+
     return await navigator.mediaDevices.getDisplayMedia({
       video: {
         displaySurface: "monitor",
-        height: 1080,
-        width: 1920,
       },
       audio: true,
     });
@@ -58,8 +71,13 @@ export const startScreenShare = async (): Promise<MediaStream | null> => {
 
 export const startVideoCall = async (): Promise<MediaStream | null> => {
   try {
+    if (!isBrowser) return null;
+
     return await navigator.mediaDevices.getUserMedia({
-      video: true,
+      video: {
+        width: 120,
+        height: 120,
+      },
       audio: true,
     });
   } catch (error) {

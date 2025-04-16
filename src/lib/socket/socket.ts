@@ -5,4 +5,10 @@ import { SERVER_URL } from "../config";
 
 console.log(process.env.SERVER_URL);
 
-export const socket = typeof window !== "undefined" ? io(SERVER_URL) : null;
+export const socket =
+  typeof window !== "undefined"
+    ? io(SERVER_URL, {
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      })
+    : null;

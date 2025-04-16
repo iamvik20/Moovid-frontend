@@ -17,9 +17,9 @@ export default function VideoCall({ roomId }: videoCallProps) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
-  const [userId] = useState(() => {
-    `user-${Math.random().toString(36).substring(2, 9)}`;
-  });
+  const [userId] = useState(
+    () => `user-${Math.random().toString(36).substring(2, 9)}`
+  );
 
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -27,6 +27,7 @@ export default function VideoCall({ roomId }: videoCallProps) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
+  console.log(userId)
   useEffect(() => {
     // Initialize video call
     const init = async () => {
@@ -35,7 +36,6 @@ export default function VideoCall({ roomId }: videoCallProps) {
       if (stream && localVideoRef.current) {
         setLocalStream(stream);
         localVideoRef.current.srcObject = stream;
-
         // Join room after getting local stream
         socket?.emit("join-room", roomId, userId);
 
@@ -107,7 +107,9 @@ export default function VideoCall({ roomId }: videoCallProps) {
             </button>
           </div>
           <div
-            className={`absolute top-2 left-2 text-sm ${isVideoOff ? "text-white": ""} bg-black/40 p-1 rounded`}
+            className={`absolute top-2 left-2 text-sm ${
+              isVideoOff ? "text-white" : ""
+            } bg-black/40 p-1 rounded`}
           >
             You
           </div>
